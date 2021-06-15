@@ -16,6 +16,11 @@ app.use(express.static("public"));
 mongoose.connect("mongodb+srv://mongoDBUser:rWw7O7EjunfSN6jU@cluster0.qt0qr.mongodb.net/todolist?retryWrites=true&w=majority",{
   useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false
 });
+const connection = mongoose.connection;
+
+connection.once("open", function () {
+	console.log("MongoDB database connection established successfully");
+});
 
 const todoSchema = new mongoose.Schema({
   name: String
@@ -59,7 +64,7 @@ app.get("/", function(req, res) {
 });
 app.get("/:newListName",(req,res)=>{
   const listName = _.capitalize(req.params.newListName);
-  
+
   List.findOne({name: listName},(err,foundList)=>{
     if (!err){
       if(!foundList){
@@ -97,13 +102,15 @@ app.post("/", function(req, res){
   }
 });
 
+
 app.post("/delete",(req,res)=>{
   const checkedItem = req.body.checkbox;
   const listName = req.body.listName;
 
   if(listName == "Today"){
-    Item.findByIdAndRemove(checkedItem,(err)=>{
+    Item.findByIdAndRemove(checkedItem,(err,deletedDoc)=>{
       if(!err){
+        console.log(deletedDoc);
         console.log("Successfully deleted");
         res.redirect("/");
       };
@@ -115,10 +122,6 @@ app.post("/delete",(req,res)=>{
       }
     })
   }
-
-
- 
- 
 });
 
 
@@ -127,6 +130,6 @@ app.get("/about", function(req, res){
   res.render("about");
 });
 
-app.listen(process.env.PORT, function() {
+app.listen(process.env.PORT || 3000, function() {
   console.log("Server started succesfully");
 });
