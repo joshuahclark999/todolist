@@ -15,7 +15,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 
-mongoose.connect(process.env.URI,{
+mongoose.connect(process.env.URI || 'mongodb+srv://mongoDBUser:rWw7O7EjunfSN6jU@cluster0.qt0qr.mongodb.net/todolist?retryWrites=true&w=majority',{
   useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false
 },(err)=>{
   if(err) console.error(err);
