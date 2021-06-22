@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const date = require(__dirname + "/date.js");
+require('dotenv').config()
 const _ = require("lodash");
 
 const app = express();
@@ -13,9 +14,13 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb+srv://mongoDBUser:rWw7O7EjunfSN6jU@cluster0.qt0qr.mongodb.net/todolist?retryWrites=true&w=majority",{
+
+mongoose.connect(process.env.URI,{
   useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false
+},(err)=>{
+  if(err) console.error(err);
 });
+
 const connection = mongoose.connection;
 
 connection.once("open", function () {
@@ -53,7 +58,6 @@ app.get("/", function(req, res) {
     if(items.length === 0){
       Item.insertMany(defaultItems,(err)=>{
         if(err) return console.error(err);
-        console.log("Success");
       });
       res.redirect("/");
     }else{
@@ -110,8 +114,6 @@ app.post("/delete",(req,res)=>{
   if(listName == "Today"){
     Item.findByIdAndRemove(checkedItem,(err,deletedDoc)=>{
       if(!err){
-        console.log(deletedDoc);
-        console.log("Successfully deleted");
         res.redirect("/");
       };
      });
